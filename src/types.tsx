@@ -3,6 +3,12 @@ interface Study {
   name: string
 }
 
+interface PlayerInfo {
+  name: string,
+  title: string,
+  elo: string
+}
+
 interface ModelRefs {
   piecesModelRef: any,
   xcornersModelRef: any
@@ -53,10 +59,12 @@ type SetString = React.Dispatch<React.SetStateAction<string>>
 type SetStringArray = React.Dispatch<React.SetStateAction<string[]>>
 type SetNumber = React.Dispatch<React.SetStateAction<number>>
 type SetStudy = React.Dispatch<React.SetStateAction<Study | null>>
+type SetPlayers = React.Dispatch<React.SetStateAction<PlayerInfo[]>>
+type SetPlayer = React.Dispatch<React.SetStateAction<PlayerInfo | null>>
 
 export type { 
   RootState, Study, ModelRefs, MovesData, MovesPair, 
   CornersDict, CornersKey, CornersPayload, Game,
   SetBoolean, SetString, SetStringArray, SetNumber, Mode,
-  SetStudy
+  SetStudy, PlayerInfo, SetPlayers, SetPlayer
 }

@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux';
 import { cornersReset, cornersSelect } from '../../slices/cornersSlice';
 import { Container } from "../common";
 import LoadModels from "../../utils/loadModels";
-import { CornersDict, Mode, ModelRefs, Study } from "../../types";
+import { CornersDict, Mode, ModelRefs, PlayerInfo, Study } from "../../types";
 import RecordSidebar from "../record/recordSidebar";
 import UploadSidebar from "../upload/uploadSidebar";
 import BroadcastSidebar from "../broadcast/broadcastSidebar";
@@ -24,6 +24,10 @@ const PortraitWarning = () => {
   )
 }
 
+const pgnTagValue = (value: string) => {
+  return value.replace(/\\/g, "\\\\").replace(/\"/g, '\\"');
+}
+
 const VideoAndSidebar = ({ mode }: { mode: Mode }) => {
   const context = useOutletContext<ModelRefs>();
   const dispatch = useDispatch();
@@ -36,6 +40,9 @@ const VideoAndSidebar = ({ mode }: { mode: Mode }) => {
   const [playing, setPlaying] = useState<boolean>(false);
   const [study, setStudy] = useState<Study | null>(null);
   const [boardNumber, setBoardNumber] = useState<number>(-1);
+  const [players, setPlayers] = useState<PlayerInfo[]>([]);
+  const [whitePlayer, setWhitePlayer] = useState<PlayerInfo | null>(null);
+  const [blackPlayer, setBlackPlayer] = useState<PlayerInfo | null>(null);
   
   const videoRef = useRef<any>(null);
   const playingRef = useRef<boolean>(playing);
@@ -48,13 +55,24 @@ const VideoAndSidebar = ({ mode }: { mode: Mode }) => {
       return;
     }
     
+    const whiteName = pgnTagValue(whitePlayer?.name || `White ${boardNumber}`);
+    const blackName = pgnTagValue(blackPlayer?.name || `Black ${boardNumber}`);
+    const whiteTitle = pgnTagValue(whitePlayer?.title || "");
+    const blackTitle = pgnTagValue(blackPlayer?.title || "");
+    const whiteElo = pgnTagValue(whitePlayer?.elo || "");
+    const blackElo = pgnTagValue(blackPlayer?.elo || "");
+
     const broadcastPgn = [
       `[Result "*"]`,
       `[FEN "${START_FEN}"]`,
       `[Board "${boardNumber}"]`,
       `[Site "${boardNumber}"]`,
-      `[White "White ${boardNumber}"]`,
-      `[Black "Black ${boardNumber}"]`,
+      `[White "${whiteName}"]`,
+      `[Black "${blackName}"]`,
+      `[WhiteTitle "${whiteTitle}"]`,
+      `[BlackTitle "${blackTitle}"]`,
+      `[WhiteElo "${whiteElo}"]`,
+      `[BlackElo "${blackElo}"]`,
       `[Annotator "ChessCam"]`,
       "",
       moves
@@ -86,6 +104,12 @@ const VideoAndSidebar = ({ mode }: { mode: Mode }) => {
     "setText": setText,
     "setBoardNumber": setBoardNumber,
     "setStudy": setStudy,
+    "players": players,
+    "setPlayers": setPlayers,
+    "whitePlayer": whitePlayer,
+    "setWhitePlayer": setWhitePlayer,
+    "blackPlayer": blackPlayer,
+    "setBlackPlayer": setBlackPlayer,
     "piecesModelRef": context.piecesModelRef,
     "xcornersModelRef": context.xcornersModelRef,
     "videoRef": videoRef,

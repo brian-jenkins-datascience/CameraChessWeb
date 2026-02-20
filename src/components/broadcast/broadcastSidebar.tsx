@@ -1,14 +1,18 @@
 import { CornersButton, Sidebar, RecordButton, StopButton, StudyButton, DeviceButton } from "../common";
-import { SetBoolean, SetNumber, SetStringArray, SetStudy, Study } from "../../types";
+import { PlayerInfo, SetBoolean, SetNumber, SetPlayer, SetPlayers, SetStringArray, SetStudy, Study } from "../../types";
 import BoardNumberInput from "./boardNumberInput";
+import PlayerCsvInput from "./playerCsvInput";
 
 const BroadcastSidebar = ({ piecesModelRef, xcornersModelRef, videoRef, canvasRef, sidebarRef, 
-  playing, setPlaying, text, setText, study, setStudy, setBoardNumber }: {
+  playing, setPlaying, text, setText, study, setStudy, setBoardNumber, players, setPlayers, whitePlayer, setWhitePlayer, blackPlayer, setBlackPlayer }: {
   piecesModelRef: any, xcornersModelRef: any, videoRef: any, canvasRef: any, sidebarRef: any,
   playing: boolean, setPlaying: SetBoolean, 
   text: string[], setText: SetStringArray,
   study: Study | null, setStudy: SetStudy,
-  setBoardNumber: SetNumber
+  setBoardNumber: SetNumber,
+  players: PlayerInfo[], setPlayers: SetPlayers,
+  whitePlayer: PlayerInfo | null, setWhitePlayer: SetPlayer,
+  blackPlayer: PlayerInfo | null, setBlackPlayer: SetPlayer
 }) => {
   const inputStyle = {
     display: playing ? "none": "inline-block"
@@ -23,6 +27,17 @@ const BroadcastSidebar = ({ piecesModelRef, xcornersModelRef, videoRef, canvasRe
       </li>
       <li className="my-1" style={inputStyle}>
         <BoardNumberInput setBoardNumber={setBoardNumber} />
+      </li>
+      <li className="my-1" style={inputStyle}>
+        <PlayerCsvInput
+          players={players}
+          setPlayers={setPlayers}
+          whitePlayer={whitePlayer}
+          setWhitePlayer={setWhitePlayer}
+          blackPlayer={blackPlayer}
+          setBlackPlayer={setBlackPlayer}
+          setText={setText}
+        />
       </li>
       <li className="my-1" style={inputStyle}>
         <CornersButton piecesModelRef={piecesModelRef} xcornersModelRef={xcornersModelRef} videoRef={videoRef} canvasRef={canvasRef} 
