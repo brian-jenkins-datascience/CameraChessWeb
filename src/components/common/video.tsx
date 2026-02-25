@@ -1,5 +1,5 @@
 import { findPieces } from "../../utils/findPieces";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CORNER_KEYS, MARKER_DIAMETER, MARKER_RADIUS, MEDIA_ASPECT_RATIO, MEDIA_CONSTRAINTS } from "../../utils/constants";
 import { Corners } from ".";
 import { useWindowWidth, useWindowHeight } from '@react-hook/window-size';
@@ -30,6 +30,52 @@ const Video = ({ piecesModelRef, canvasRef, videoRef, sidebarRef, playing,
   const windowWidth = useWindowWidth();
   const windowHeight = useWindowHeight();
   const dispatch = useDispatch();
+  const [nowMs, setNowMs] = useState<number>(Date.now());
+
+  const formatClock = (timeMs: number): string => {
+    const totalSeconds = Math.max(0, Math.floor(timeMs / 1000));
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+  }
+
+  const getDisplayedClockTimes = (currentGame: Game, timestampMs: number) => {
+    let whiteTimeMs = currentGame.whiteTimeMs;
+    let blackTimeMs = currentGame.blackTimeMs;
+
+    if (playingRef.current && (currentGame.activeClockColor !== null) && (currentGame.lastClockSwitchMs !== null)) {
+      const elapsedMs = Math.max(0, timestampMs - currentGame.lastClockSwitchMs);
+      const delayMs = Math.round(currentGame.delaySeconds * 1000);
+      const spentMs = Math.max(0, elapsedMs - delayMs);
+
+      if (currentGame.activeClockColor === "w") {
+        whiteTimeMs = Math.max(0, whiteTimeMs - spentMs);
+      } else {
+        blackTimeMs = Math.max(0, blackTimeMs - spentMs);
+      }
+    }
+
+    return {
+      white: formatClock(whiteTimeMs),
+      black: formatClock(blackTimeMs)
+    };
+  }
+
+  useEffect(() => {
+    if (!playing) {
+      return;
+    }
+
+    const intervalId = window.setInterval(() => {
+      setNowMs(Date.now());
+    }, 250);
+
+    return () => {
+      window.clearInterval(intervalId);
+    }
+  }, [playing]);
 
   useEffect(() => {
     gameRef.current = game;
@@ -170,6 +216,29 @@ const Video = ({ piecesModelRef, canvasRef, videoRef, sidebarRef, playing,
     backgroundColor: "#343a40",
   }
 
+  const clockOverlayStyle: React.CSSProperties = {
+    position: "absolute",
+    top: `${MARKER_DIAMETER}px`,
+    left: `${MARKER_DIAMETER}px`,
+    right: `${MARKER_DIAMETER}px`,
+    display: "flex",
+    justifyContent: "space-between",
+    color: "white",
+    fontSize: "14px",
+    fontWeight: 600,
+    pointerEvents: "none",
+    textShadow: "0 1px 2px rgba(0, 0, 0, 0.8)",
+    zIndex: 5
+  }
+
+  const clockPillStyle: React.CSSProperties = {
+    backgroundColor: "rgba(0, 0, 0, 0.45)",
+    borderRadius: "4px",
+    padding: "2px 6px"
+  }
+
+  const displayedClocks = getDisplayedClockTimes(game, nowMs);
+
   const onLoadedMetadata = () => {  
     if (mode === "upload") {
       return;
@@ -226,6 +295,10 @@ const Video = ({ piecesModelRef, canvasRef, videoRef, sidebarRef, playing,
           onLoadedMetadata={onLoadedMetadata} style={videoStyle} 
           onCanPlay={onCanPlay} onEnded={onEnded} />
           <canvas ref={canvasRef} style={canvasStyle} />
+        </div>
+        <div style={clockOverlayStyle}>
+          <div style={clockPillStyle}>White {displayedClocks.white}</div>
+          <div style={clockPillStyle}>Black {displayedClocks.black}</div>
         </div>
         <Corners />
       </div>

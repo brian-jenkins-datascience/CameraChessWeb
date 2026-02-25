@@ -118,9 +118,9 @@ const gameSlice = createSlice({
 const getMovesFromPgn = (board: Chess) => {
   const pgn = board.pgn();
 
-  // Get rid of the headers (strings beginning with "[" and ending with "]")
-  // Get rid of newline characters
-  const moves = pgn.replace(/\[.*?\]/g, '').replace(/\r?\n|\r/g, '');
+  // Remove header tag lines only; keep move comments such as {[%clk 00:10:00]}
+  const noHeaders = pgn.replace(/^\[[^\]]*\]\s*$/gm, '');
+  const moves = noHeaders.replace(/\r?\n|\r/g, ' ').replace(/\s+/g, ' ').trim();
   return moves
 }
 
