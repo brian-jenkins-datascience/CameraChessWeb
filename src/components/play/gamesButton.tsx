@@ -2,25 +2,26 @@ import { useState } from "react";
 import { lichessGetPlaying } from "../../utils/lichess";
 import { userSelect } from "../../slices/userSlice";
 import { Chess } from "chess.js";
-import { gameSetStart, gameUpdate, makeUpdatePayload } from "../../slices/gameSlice";
+import { gameSelect, gameSetStart, gameUpdate, makeUpdatePayload } from "../../slices/gameSlice";
 import { useDispatch } from "react-redux";
 import { SetStringArray } from "../../types";
 
 const GamesButton = ({setGameId, setColor, setText}: 
   { setGameId: any, setColor: any, setText: SetStringArray}) => {
   const token: string = userSelect().token;
+  const gameState = gameSelect();
   const [games, setGames] = useState<any[]>([]);
-  const [game, setGame] = useState<any>(null);
+  const [selectedGame, setSelectedGame] = useState<any>(null);
   const dispatch = useDispatch();
 
   const handleClick = async (e: any, newGame: any) => {
     e.preventDefault();
 
-    if (game?.fullId === newGame.fullId) {
+    if (selectedGame?.fullId === newGame.fullId) {
       return;
     }
 
-    setGame(newGame);
+    setSelectedGame(newGame);
     setGameId(newGame.gameId);
     setColor((newGame.color === "white") ? "w" : "b");
     
@@ -29,7 +30,7 @@ const GamesButton = ({setGameId, setColor, setText}:
     setText(["Starting game", `${colorText} vs ${opponent}`]);
     
     const board = new Chess(newGame.fen);
-    const payload = makeUpdatePayload(board);
+    const payload = makeUpdatePayload(board, gameState);
     dispatch(gameUpdate(payload))
     dispatch(gameSetStart(newGame.fen));
   }
@@ -45,7 +46,7 @@ const GamesButton = ({setGameId, setColor, setText}:
     <div className="dropdown">
       <button className="btn btn-dark btn-sm btn-outline-light dropdown-toggle w-100" id="deviceButton" data-bs-toggle="dropdown" aria-expanded="false"
       onClick={(e) => getGames(e)}>
-      {(game === null) ? "Select a Game": `Game: ${game.opponent.username}`}
+      {(selectedGame === null) ? "Select a Game": `Game: ${selectedGame.opponent.username}`}
       </button>
       <ul className="dropdown-menu" aria-labelledby="deviceButton">
         {games.map((game: any) => 

@@ -1,4 +1,4 @@
-import { CornersButton, Sidebar, RecordButton, StopButton, FenButton, DeviceButton } from "../common";
+import { ClockSettingsInput, CornersButton, Sidebar, RecordButton, StopButton, FenButton, DeviceButton } from "../common";
 import { SetBoolean, SetStringArray } from "../../types";
 
 const RecordSidebar = ({ piecesModelRef, xcornersModelRef, videoRef, canvasRef, sidebarRef, 
@@ -23,6 +23,9 @@ const RecordSidebar = ({ piecesModelRef, xcornersModelRef, videoRef, canvasRef, 
       <li className="my-1" style={inputStyle}>
         <FenButton piecesModelRef={piecesModelRef} videoRef={videoRef} 
         canvasRef={canvasRef} setText={setText} cornersRef={cornersRef} />
+      </li>
+      <li className="my-1" style={inputStyle}>
+        <ClockSettingsInput />
       </li>
       <li className="my-1">
         <div className="btn-group w-100" role="group">

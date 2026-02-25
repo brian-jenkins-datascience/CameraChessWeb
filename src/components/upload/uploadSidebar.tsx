@@ -1,5 +1,5 @@
 import { VideoButton, PlayButton, RestartButton, PlaybackButtons, StopButton } from "./buttons";
-import { CornersButton, Sidebar, FenButton } from "../common";
+import { ClockSettingsInput, CornersButton, Sidebar, FenButton } from "../common";
 import { SetBoolean, SetStringArray } from "../../types";
 
 const UploadSidebar = ({ videoRef, xcornersModelRef, piecesModelRef, canvasRef, 
@@ -29,6 +29,9 @@ const UploadSidebar = ({ videoRef, xcornersModelRef, piecesModelRef, canvasRef,
       </li>
       <li className="my-1" style={inputStyle}>
         <PlaybackButtons videoRef={videoRef} />
+      </li>
+      <li className="my-1" style={inputStyle}>
+        <ClockSettingsInput />
       </li>
       <li className="my-1">
         <div className="btn-group w-100" role="group">

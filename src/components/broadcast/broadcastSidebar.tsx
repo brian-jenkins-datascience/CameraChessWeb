@@ -1,4 +1,4 @@
-import { CornersButton, Sidebar, RecordButton, StopButton, StudyButton, DeviceButton } from "../common";
+import { ClockSettingsInput, CornersButton, Sidebar, RecordButton, StopButton, StudyButton, DeviceButton } from "../common";
 import { PlayerInfo, SetBoolean, SetNumber, SetPlayer, SetPlayers, SetStringArray, SetStudy, Study } from "../../types";
 import BoardNumberInput from "./boardNumberInput";
 import PlayerCsvInput from "./playerCsvInput";
@@ -42,6 +42,9 @@ const BroadcastSidebar = ({ piecesModelRef, xcornersModelRef, videoRef, canvasRe
       <li className="my-1" style={inputStyle}>
         <CornersButton piecesModelRef={piecesModelRef} xcornersModelRef={xcornersModelRef} videoRef={videoRef} canvasRef={canvasRef} 
         setText={setText} />
+      </li>
+      <li className="my-1" style={inputStyle}>
+        <ClockSettingsInput />
       </li>
       <li className="my-1">
         <div className="btn-group w-100" role="group">

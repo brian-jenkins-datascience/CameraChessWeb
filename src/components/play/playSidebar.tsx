@@ -1,4 +1,4 @@
-import { CornersButton, Sidebar, RecordButton, DeviceButton } from "../common";
+import { ClockSettingsInput, CornersButton, Sidebar, RecordButton, DeviceButton } from "../common";
 import { Game, SetBoolean, SetStringArray } from "../../types";
 import { userSelect } from "../../slices/userSlice";
 import { useEffect, useRef, useState } from "react";
@@ -52,7 +52,7 @@ import GamesButton from "./gamesButton";
 
       const board = makeBoard(gameRef.current);
       board.move(lastMove);
-      const payload = makeUpdatePayload(board);
+      const payload = makeUpdatePayload(board, gameRef.current);
       console.log("payload", payload);
       dispatch(gameUpdate(payload));
     }
@@ -76,6 +76,9 @@ import GamesButton from "./gamesButton";
         <li className="my-1" style={inputStyle}>
           <CornersButton piecesModelRef={piecesModelRef} xcornersModelRef={xcornersModelRef} videoRef={videoRef} canvasRef={canvasRef} 
           setText={setText} />
+        </li>
+        <li className="my-1" style={inputStyle}>
+          <ClockSettingsInput />
         </li>
         <li className="my-1">
           <div className="btn-group w-100" role="group">

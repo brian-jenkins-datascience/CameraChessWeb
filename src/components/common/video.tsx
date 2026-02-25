@@ -22,6 +22,7 @@ const Video = ({ piecesModelRef, canvasRef, videoRef, sidebarRef, playing,
 
   const displayRef = useRef<any>(null);
   const boardRef = useRef<Chess>(makeBoard(game));
+  const gameRef = useRef<Game>(game);
   const movesPairsRef = useRef<MovesPair[]>(getMovesPairs(boardRef.current));
   const lastMoveRef = useRef<string>(game.lastMove);
   const moveTextRef = useRef<string>("");
@@ -31,6 +32,7 @@ const Video = ({ piecesModelRef, canvasRef, videoRef, sidebarRef, playing,
   const dispatch = useDispatch();
 
   useEffect(() => {
+    gameRef.current = game;
     const board = makeBoard(game);
     moveTextRef.current = getMoveText(board);
     if (game.greedy === true) {
@@ -116,7 +118,7 @@ const Video = ({ piecesModelRef, canvasRef, videoRef, sidebarRef, playing,
     }
 
     findPieces(piecesModelRef, videoRef, canvasRef, playingRef, setText, dispatch, 
-      cornersRef, boardRef, movesPairsRef, lastMoveRef, moveTextRef, mode);
+      cornersRef, boardRef, movesPairsRef, lastMoveRef, moveTextRef, gameRef, mode);
 
     const stopWebcam = async () => {
       const stream = await streamPromise;

@@ -38,7 +38,14 @@ interface Game {
   moves: string,
   start: string,
   lastMove: string,
-  greedy: boolean
+  greedy: boolean,
+  initialMinutes: number,
+  incrementSeconds: number,
+  delaySeconds: number,
+  whiteTimeMs: number,
+  blackTimeMs: number,
+  activeClockColor: "w" | "b" | null,
+  lastClockSwitchMs: number | null
 }
 
 interface User {
