@@ -71,6 +71,10 @@ export const gameSelect = () => {
   return useSelector((state: RootState) => state.game)
 }
 
+const makeRawPgn = (game: Game) => {
+  return `[FEN "${game.start}"]` + "\n \n" + game.moves;
+}
+
 export const makePgn = (game: Game) => {
   let moves = game.moves;
   
@@ -132,7 +136,7 @@ export const makeUpdatePayload = (board: Chess, greedy: boolean=false) => {
 
 export const makeBoard = (game: Game): Chess => {
   const board = new Chess(game.start);
-  board.loadPgn(makePgn(game));
+  board.loadPgn(makeRawPgn(game));
   return board;
 }
 
