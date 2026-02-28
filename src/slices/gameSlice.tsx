@@ -9,7 +9,8 @@ const initialState: Game = {
   "fen": START_FEN,
   "start": START_FEN,
   "lastMove": "",
-  "greedy": false
+  "greedy": false,
+  "clocks": []
 };
 
 const gameSlice = createSlice({
@@ -46,9 +47,13 @@ const gameSlice = createSlice({
         "moves": action.payload.moves,
         "fen": action.payload.fen,
         "lastMove": action.payload.lastMove,
-        "greedy": action.payload.greedy
+        "greedy": action.payload.greedy,
+        "clocks": action.payload.clocks ?? state.clocks
       }
       return newState
+    },
+    gameResetClocks(state) {
+      state.clocks = initialState.clocks;
     }
   }
 })
@@ -67,7 +72,45 @@ export const gameSelect = () => {
 }
 
 export const makePgn = (game: Game) => {
-  return `[FEN "${game.start}"]` + "\n \n" + game.moves;
+  let moves = game.moves;
+  
+  // Inject clock annotations if we have them
+  if (game.clocks.length > 0) {
+    moves = injectClockAnnotations(moves, game.clocks);
+  }
+  
+  return `[FEN "${game.start}"]` + "\n \n" + moves;
+}
+
+/**
+ * Inject clock annotations into the move string.
+ * Input moves: "1. e4 e5 2. Nf3 Nc6"
+ * Input clocks: ["00:20:28", "00:20:25", "00:19:50", "00:19:45"]
+ * Output: "1. e4 { [%clk 00:20:28] } e5 { [%clk 00:20:25] } 2. Nf3 { [%clk 00:19:50] } Nc6 { [%clk 00:19:45] }"
+ */
+const injectClockAnnotations = (movesStr: string, clocks: string[]): string => {
+  // Parse the moves string to find individual SAN moves
+  // Tokenize: move numbers like "1." or "1..." and SAN moves
+  const tokens = movesStr.trim().split(/\s+/);
+  const result: string[] = [];
+  let halfMoveIndex = 0;
+
+  for (const token of tokens) {
+    // Skip move numbers (e.g., "1.", "2.", "1...")
+    if (/^\d+\./.test(token)) {
+      result.push(token);
+      continue;
+    }
+    
+    // This is a SAN move
+    result.push(token);
+    if (halfMoveIndex < clocks.length && clocks[halfMoveIndex]) {
+      result.push(`{ [%clk ${clocks[halfMoveIndex]}] }`);
+    }
+    halfMoveIndex++;
+  }
+
+  return result.join(' ');
 }
 
 export const makeUpdatePayload = (board: Chess, greedy: boolean=false) => {
@@ -97,6 +140,6 @@ export const {
   gameSetMoves, gameResetMoves,
   gameSetFen, gameResetFen, 
   gameSetStart, gameResetStart,
-  gameSetLastMove, gameResetLastMove, gameUpdate
+  gameSetLastMove, gameResetLastMove, gameUpdate, gameResetClocks
 } = gameSlice.actions
 export default gameSlice.reducer

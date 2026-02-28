@@ -1,12 +1,13 @@
-import { CornersButton, Sidebar, RecordButton, StopButton, FenButton, DeviceButton } from "../common";
+import { CornersButton, Sidebar, RecordButton, StopButton, FenButton, DeviceButton, ClockButton } from "../common";
 import { SetBoolean, SetStringArray } from "../../types";
 
 const RecordSidebar = ({ piecesModelRef, xcornersModelRef, videoRef, canvasRef, sidebarRef, 
-  playing, setPlaying, text, setText, cornersRef }: {
+  playing, setPlaying, text, setText, cornersRef, showClockBoxes, setShowClockBoxes }: {
   piecesModelRef: any, xcornersModelRef: any, videoRef: any, canvasRef: any, sidebarRef: any,
   playing: boolean, setPlaying: SetBoolean, 
   text: string[], setText: SetStringArray,
-  cornersRef: any
+  cornersRef: any,
+  showClockBoxes: boolean, setShowClockBoxes: SetBoolean
 }) => {
   const inputStyle = {
     display: playing ? "none": "inline-block"
@@ -23,6 +24,9 @@ const RecordSidebar = ({ piecesModelRef, xcornersModelRef, videoRef, canvasRef, 
       <li className="my-1" style={inputStyle}>
         <FenButton piecesModelRef={piecesModelRef} videoRef={videoRef} 
         canvasRef={canvasRef} setText={setText} cornersRef={cornersRef} />
+      </li>
+      <li className="my-1" style={inputStyle}>
+        <ClockButton showClockBoxes={showClockBoxes} setShowClockBoxes={setShowClockBoxes} />
       </li>
       <li className="my-1">
         <div className="btn-group w-100" role="group">

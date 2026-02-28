@@ -3,10 +3,11 @@ import * as tf from "@tensorflow/tfjs-core";
 import { getInvTransform, transformBoundary, transformCenters } from "./warp";
 import { gameUpdate, makeUpdatePayload } from "../slices/gameSlice";
 import { getBoxesAndScores, getInput, getXY, invalidVideo } from "./detect";
-import {  Mode, MovesData, MovesPair } from "../types";
+import {  ClockBoxDict, Mode, MovesData, MovesPair } from "../types";
 import { zeros } from "./math";
 import { CORNER_KEYS } from "./constants";
 import { Chess } from "chess.js";
+import { readClockFromVideo } from "./readClock";
 
 const calculateScore = (state: any, move: MovesData, from_thr=0.6, to_thr=0.6) => {
   let score = 0;
@@ -177,7 +178,8 @@ export const getKeypoints = (cornersRef: any, canvasRef: any): number[][] => {
 
 export const findPieces = (modelRef: any, videoRef: any, canvasRef: any,
 playingRef: any, setText: any, dispatch: any, cornersRef: any, boardRef: any, 
-movesPairsRef: any, lastMoveRef: any, moveTextRef: any, mode: Mode) => {
+movesPairsRef: any, lastMoveRef: any, moveTextRef: any, mode: Mode,
+clockBoxRef?: any, clocksRef?: any) => {
   let centers: number[][] | null = null;
   let boundary: number[][];
   let centers3D: tf.Tensor3D;
@@ -246,6 +248,47 @@ movesPairsRef: any, lastMoveRef: any, moveTextRef: any, mode: Mode) => {
         const payload = makeUpdatePayload(boardRef.current, greedy);
         console.log("payload", payload);
         dispatch(gameUpdate(payload));
+
+        // Read clocks asynchronously after a move is detected
+        if (clockBoxRef && clocksRef) {
+          const clockBox: ClockBoxDict = clockBoxRef.current;
+          const canvasH = canvasRef.current.height;
+          const canvasW = canvasRef.current.width;
+          
+          // Determine which side just moved based on half-move count
+          const history = boardRef.current.history();
+          const halfMoveCount = history.length;
+          // After a move, the side that moved is the opposite of current turn
+          // halfMoveCount odd = white just moved, even = black just moved  
+          const whiteJustMoved = (halfMoveCount % 2 === 1);
+
+          // Convert marker coordinates to model coordinates for the clock that just moved
+          const tlKey = whiteJustMoved ? "whiteTL" : "blackTL";
+          const brKey = whiteJustMoved ? "whiteBR" : "blackBR";
+          const tl = getXY(clockBox[tlKey], canvasH, canvasW);
+          const br = getXY(clockBox[brKey], canvasH, canvasW);
+
+          // Only read if the clock box is in a valid position (not offscreen)
+          if (tl[1] >= 0 && br[1] >= 0) {
+            readClockFromVideo(videoRef, tl, br).then((clockValue) => {
+              if (clockValue && clocksRef.current) {
+                // Store at the correct half-move index
+                const idx = halfMoveCount - 1;
+                const newClocks = [...clocksRef.current];
+                // Extend array if needed
+                while (newClocks.length <= idx) {
+                  newClocks.push("");
+                }
+                newClocks[idx] = clockValue;
+                clocksRef.current = newClocks;
+
+                // Re-dispatch with clock data
+                const clockPayload = { ...payload, clocks: newClocks };
+                dispatch(gameUpdate(clockPayload));
+              }
+            });
+          }
+        }
       }
       setText([`FPS: ${fps}`, moveTextRef.current]);
       

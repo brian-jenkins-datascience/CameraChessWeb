@@ -1,10 +1,11 @@
-import { CornersButton, Sidebar, RecordButton, StopButton, StudyButton, DeviceButton } from "../common";
+import { CornersButton, Sidebar, RecordButton, StopButton, StudyButton, DeviceButton, ClockButton } from "../common";
 import { PlayerInfo, SetBoolean, SetNumber, SetPlayer, SetPlayers, SetStringArray, SetStudy, Study } from "../../types";
 import BoardNumberInput from "./boardNumberInput";
 import PlayerCsvInput from "./playerCsvInput";
 
 const BroadcastSidebar = ({ piecesModelRef, xcornersModelRef, videoRef, canvasRef, sidebarRef, 
-  playing, setPlaying, text, setText, study, setStudy, setBoardNumber, players, setPlayers, whitePlayer, setWhitePlayer, blackPlayer, setBlackPlayer }: {
+  playing, setPlaying, text, setText, study, setStudy, setBoardNumber, players, setPlayers, whitePlayer, setWhitePlayer, blackPlayer, setBlackPlayer,
+  showClockBoxes, setShowClockBoxes }: {
   piecesModelRef: any, xcornersModelRef: any, videoRef: any, canvasRef: any, sidebarRef: any,
   playing: boolean, setPlaying: SetBoolean, 
   text: string[], setText: SetStringArray,
@@ -12,7 +13,8 @@ const BroadcastSidebar = ({ piecesModelRef, xcornersModelRef, videoRef, canvasRe
   setBoardNumber: SetNumber,
   players: PlayerInfo[], setPlayers: SetPlayers,
   whitePlayer: PlayerInfo | null, setWhitePlayer: SetPlayer,
-  blackPlayer: PlayerInfo | null, setBlackPlayer: SetPlayer
+  blackPlayer: PlayerInfo | null, setBlackPlayer: SetPlayer,
+  showClockBoxes: boolean, setShowClockBoxes: SetBoolean
 }) => {
   const inputStyle = {
     display: playing ? "none": "inline-block"
@@ -42,6 +44,9 @@ const BroadcastSidebar = ({ piecesModelRef, xcornersModelRef, videoRef, canvasRe
       <li className="my-1" style={inputStyle}>
         <CornersButton piecesModelRef={piecesModelRef} xcornersModelRef={xcornersModelRef} videoRef={videoRef} canvasRef={canvasRef} 
         setText={setText} />
+      </li>
+      <li className="my-1" style={inputStyle}>
+        <ClockButton showClockBoxes={showClockBoxes} setShowClockBoxes={setShowClockBoxes} />
       </li>
       <li className="my-1">
         <div className="btn-group w-100" role="group">

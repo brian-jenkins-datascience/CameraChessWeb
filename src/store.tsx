@@ -10,11 +10,12 @@ import {
   REGISTER,
 } from 'redux-persist'
 import storage from "redux-persist/lib/storage";
-import { cornersReducer, gameReducer, userReducer } from "./slices";
+import { cornersReducer, gameReducer, userReducer, clockBoxReducer } from "./slices";
 
 const reducer = combineReducers({
   game: gameReducer,
   corners: cornersReducer,
+  clockBox: clockBoxReducer,
   user: userReducer
 })
 

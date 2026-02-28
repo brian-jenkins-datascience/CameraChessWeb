@@ -3,13 +3,14 @@ import Video from "../common/video";
 import { useOutletContext } from "react-router-dom";
 import { useDispatch } from 'react-redux';
 import { cornersReset, cornersSelect } from '../../slices/cornersSlice';
+import { clockBoxReset, clockBoxSelect } from '../../slices/clockBoxSlice';
 import { Container } from "../common";
 import LoadModels from "../../utils/loadModels";
-import { CornersDict, Mode, ModelRefs, PlayerInfo, Study } from "../../types";
+import { ClockBoxDict, CornersDict, Mode, ModelRefs, PlayerInfo, Study } from "../../types";
 import RecordSidebar from "../record/recordSidebar";
 import UploadSidebar from "../upload/uploadSidebar";
 import BroadcastSidebar from "../broadcast/broadcastSidebar";
-import { gameResetFen, gameResetMoves, gameResetStart, gameSelect } from "../../slices/gameSlice";
+import { gameResetClocks, gameResetFen, gameResetMoves, gameResetStart, gameSelect } from "../../slices/gameSlice";
 import { lichessPushRound } from "../../utils/lichess";
 import { userSelect } from "../../slices/userSlice";
 import { START_FEN } from "../../utils/constants";
@@ -32,8 +33,10 @@ const VideoAndSidebar = ({ mode }: { mode: Mode }) => {
   const context = useOutletContext<ModelRefs>();
   const dispatch = useDispatch();
   const corners: CornersDict = cornersSelect();
+  const clockBoxes: ClockBoxDict = clockBoxSelect();
   const token: string = userSelect().token;
-  const moves: string = gameSelect().moves;
+  const game = gameSelect();
+  const moves: string = game.moves;
   const isPortrait = useMediaQuery({ orientation: 'portrait' });
 
   const [text, setText] = useState<string[]>([]);
@@ -43,12 +46,15 @@ const VideoAndSidebar = ({ mode }: { mode: Mode }) => {
   const [players, setPlayers] = useState<PlayerInfo[]>([]);
   const [whitePlayer, setWhitePlayer] = useState<PlayerInfo | null>(null);
   const [blackPlayer, setBlackPlayer] = useState<PlayerInfo | null>(null);
+  const [showClockBoxes, setShowClockBoxes] = useState<boolean>(false);
   
   const videoRef = useRef<any>(null);
   const playingRef = useRef<boolean>(playing);
   const canvasRef = useRef<any>(null);
   const sidebarRef = useRef<any>(null);
   const cornersRef = useRef<CornersDict>(corners);
+  const clockBoxRef = useRef<ClockBoxDict>(clockBoxes);
+  const clocksRef = useRef<string[]>(game.clocks);
 
   useEffect(() => {
     if (mode !== "broadcast" || (study === null) || (boardNumber === -1)) {
@@ -89,11 +95,21 @@ const VideoAndSidebar = ({ mode }: { mode: Mode }) => {
   }, [corners])
 
   useEffect(() => {
+    clockBoxRef.current = clockBoxes;
+  }, [clockBoxes])
+
+  useEffect(() => {
+    clocksRef.current = game.clocks;
+  }, [game.clocks])
+
+  useEffect(() => {
     LoadModels(context.piecesModelRef, context.xcornersModelRef);
     dispatch(cornersReset());
+    dispatch(clockBoxReset());
     dispatch(gameResetStart());
     dispatch(gameResetMoves());
     dispatch(gameResetFen());
+    dispatch(gameResetClocks());
   }, []);
 
   const props = {
@@ -117,7 +133,11 @@ const VideoAndSidebar = ({ mode }: { mode: Mode }) => {
     "sidebarRef": sidebarRef,
     "cornersRef": cornersRef,
     "playingRef": playingRef,
-    "mode": mode
+    "mode": mode,
+    "clockBoxRef": clockBoxRef,
+    "clocksRef": clocksRef,
+    "showClockBoxes": showClockBoxes,
+    "setShowClockBoxes": setShowClockBoxes
   }
   const Sidebar = () => {
     switch(mode) {

@@ -2,6 +2,7 @@ import { findPieces } from "../../utils/findPieces";
 import { useEffect, useRef } from "react";
 import { CORNER_KEYS, MARKER_DIAMETER, MARKER_RADIUS, MEDIA_ASPECT_RATIO, MEDIA_CONSTRAINTS } from "../../utils/constants";
 import { Corners } from ".";
+import ClockBoxes from "./clockBoxes";
 import { useWindowWidth, useWindowHeight } from '@react-hook/window-size';
 import { useDispatch } from 'react-redux';
 import { cornersSet } from "../../slices/cornersSlice";
@@ -12,11 +13,13 @@ import { getMovesPairs } from "../../utils/moves";
 import { Chess } from "chess.js";
 
 const Video = ({ piecesModelRef, canvasRef, videoRef, sidebarRef, playing, 
-  setPlaying, playingRef, setText, mode, cornersRef }: {
+  setPlaying, playingRef, setText, mode, cornersRef, clockBoxRef, clocksRef,
+  showClockBoxes }: {
   piecesModelRef: any, canvasRef: any, videoRef: any, sidebarRef: any, 
   playing: boolean, setPlaying: SetBoolean, playingRef: any,
   setText: SetStringArray, mode: Mode,
-  cornersRef: any
+  cornersRef: any, clockBoxRef?: any, clocksRef?: any,
+  showClockBoxes?: boolean
 }) => {
   const game: Game = gameSelect();
 
@@ -116,7 +119,8 @@ const Video = ({ piecesModelRef, canvasRef, videoRef, sidebarRef, playing,
     }
 
     findPieces(piecesModelRef, videoRef, canvasRef, playingRef, setText, dispatch, 
-      cornersRef, boardRef, movesPairsRef, lastMoveRef, moveTextRef, mode);
+      cornersRef, boardRef, movesPairsRef, lastMoveRef, moveTextRef, mode,
+      clockBoxRef, clocksRef);
 
     const stopWebcam = async () => {
       const stream = await streamPromise;
@@ -226,6 +230,7 @@ const Video = ({ piecesModelRef, canvasRef, videoRef, sidebarRef, playing,
           <canvas ref={canvasRef} style={canvasStyle} />
         </div>
         <Corners />
+        {showClockBoxes && <ClockBoxes />}
       </div>
     </div>
   );

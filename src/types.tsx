@@ -33,12 +33,20 @@ interface CornersPayload {
 }
 type CornersDict = {[key in CornersKey]: number[]};
 
+type ClockBoxKey = "whiteTL" | "whiteBR" | "blackTL" | "blackBR";
+interface ClockBoxPayload {
+  key: ClockBoxKey,
+  xy: number[]
+}
+type ClockBoxDict = {[key in ClockBoxKey]: number[]};
+
 interface Game {
   fen: string,
   moves: string,
   start: string,
   lastMove: string,
-  greedy: boolean
+  greedy: boolean,
+  clocks: string[]
 }
 
 interface User {
@@ -49,6 +57,7 @@ interface User {
 interface RootState {
   game: Game
   corners: CornersDict,
+  clockBox: ClockBoxDict,
   user: User
 }
 
@@ -65,6 +74,7 @@ type SetPlayer = React.Dispatch<React.SetStateAction<PlayerInfo | null>>
 export type { 
   RootState, Study, ModelRefs, MovesData, MovesPair, 
   CornersDict, CornersKey, CornersPayload, Game,
+  ClockBoxDict, ClockBoxKey, ClockBoxPayload,
   SetBoolean, SetString, SetStringArray, SetNumber, Mode,
   SetStudy, PlayerInfo, SetPlayers, SetPlayer
 }
