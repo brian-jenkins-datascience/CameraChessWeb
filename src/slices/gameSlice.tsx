@@ -75,7 +75,7 @@ export const makePgn = (game: Game) => {
   let moves = game.moves;
   
   // Inject clock annotations if we have them
-  if (game.clocks.length > 0) {
+  if (game.clocks && game.clocks.length > 0) {
     moves = injectClockAnnotations(moves, game.clocks);
   }
   
